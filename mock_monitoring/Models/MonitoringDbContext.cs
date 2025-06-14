@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using mock_monitoring.Lib.Events;
 
 namespace mock_monitoring.Models;
 
@@ -7,6 +8,8 @@ public class MonitoringDbContext : DbContext
 
     public DbSet<Sensor> Sensor { get; set; } = null!;
     public DbSet<SensorLog> SensorLog { get; set; } = null!;
+
+    public DbSet<Event> Event { get; set; } = null!;
 
     public MonitoringDbContext(DbContextOptions<MonitoringDbContext> options)
         : base(options)
@@ -23,7 +26,12 @@ public class MonitoringDbContext : DbContext
                 .ToTable("Sensor")
                 .HasDiscriminator<int>("Type")
                 .HasValue<TemperatureSensor>(104);
-                // .HasValue<TempHumiditySensor>(113);
+        // .HasValue<TempHumiditySensor>(113);
+
+        modelBuilder.Entity<Event>()
+                .ToTable("Event")
+                .HasDiscriminator<int>("Type")
+                .HasValue<OutOfRangeEvent>(1);
 
         base.OnModelCreating(modelBuilder);
         //seed mock temperature sensor
@@ -36,7 +44,7 @@ public class MonitoringDbContext : DbContext
                 ProfileId = 1,
                 Sample_Period = 900,
                 Enable = true,
-                Type = 104, 
+                Type = 104,
                 CreatedAt = DateTime.UtcNow,
                 Alarmen = 0
             }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using mock_monitoring.Models;
 
@@ -11,9 +12,11 @@ using mock_monitoring.Models;
 namespace mock_monitoring.Migrations
 {
     [DbContext(typeof(MonitoringDbContext))]
-    partial class MonitoringDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250614211222_Add_Events")]
+    partial class Add_Events
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,55 +24,6 @@ namespace mock_monitoring.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("mock_monitoring.Models.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("End")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Level_1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Level_2")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Level_3")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quality")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SensorId")
-                        .HasColumnType("int")
-                        .HasColumnName("SensorId");
-
-                    b.Property<int>("SensorLogId")
-                        .HasColumnType("int")
-                        .HasColumnName("SensorLogId");
-
-                    b.Property<int>("Start")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Event", (string)null);
-
-                    b.HasDiscriminator<int>("Type");
-
-                    b.UseTphMappingStrategy();
-                });
 
             modelBuilder.Entity("mock_monitoring.Models.Sensor", b =>
                 {
@@ -151,13 +105,6 @@ namespace mock_monitoring.Migrations
                     b.ToTable("SensorLog");
                 });
 
-            modelBuilder.Entity("mock_monitoring.Lib.Events.OutOfRangeEvent", b =>
-                {
-                    b.HasBaseType("mock_monitoring.Models.Event");
-
-                    b.HasDiscriminator().HasValue(1);
-                });
-
             modelBuilder.Entity("mock_monitoring.Models.TemperatureSensor", b =>
                 {
                     b.HasBaseType("mock_monitoring.Models.Sensor");
@@ -169,7 +116,7 @@ namespace mock_monitoring.Migrations
                         {
                             Id = 1,
                             Alarmen = (sbyte)0,
-                            CreatedAt = new DateTime(2025, 6, 14, 21, 16, 48, 293, DateTimeKind.Utc).AddTicks(6101),
+                            CreatedAt = new DateTime(2025, 6, 14, 21, 12, 21, 262, DateTimeKind.Utc).AddTicks(3742),
                             Enable = true,
                             MacAddress = "00:11:22:33:44:55",
                             Name = "Mock Sensor 1",

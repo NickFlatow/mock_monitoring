@@ -26,6 +26,7 @@ public class SensorDataGeneratorService(IServiceProvider serviceProvider) : Back
 
         using var scope = _serviceProvider.CreateScope();
         _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
-        _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 35 + 15)).Wait();
+        // _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 35 + 15)).Wait();
+        _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 20)).Wait();
     }
 }

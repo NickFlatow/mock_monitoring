@@ -21,7 +21,7 @@ builder.Services.AddDbContext<MonitoringDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
-
+builder.Services.AddScoped<IEventRepository, EventRepository>(); // Register IEventRepository
 builder.Services.AddScoped<ISensorRepository, SensorRepository>(); // Register ISensorRepository
 // builder.Services.AddScoped<ISensorService, SensorService>();
 
