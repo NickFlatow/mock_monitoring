@@ -10,9 +10,8 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
 {
 
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private  ISensorRepository? _sensorRepository;
-    // private readonly ISensorService _sensorService;
-
+    private ISensorRepository? _sensorRepository;
+    private IEventRepository? _eventRepository;
     private readonly TimeSpan _interval = TimeSpan.FromSeconds(60);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,10 +31,7 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
         using var scope = _serviceProvider.CreateScope();
 
         _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
-        IEventRepository eventRepository = scope.ServiceProvider.GetRequiredService<IEventRepository>();
-
-
-        // Retrieve all sensors of type T from the repository
+        _eventRepository = scope.ServiceProvider.GetRequiredService<IEventRepository>();
         var sensors = await _sensorRepository.GetAllSensorsAsync<Sensor>();
         foreach (var sensor in sensors)
         {
@@ -47,22 +43,28 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
                 Console.WriteLine($"Sensor {sensor.Name} with ID {sensor.Id} is disabled.");
                 continue;
             }
-            var oor = new OutOfRangeEventGenerator(eventRepository, _sensorRepository);
-            await oor.CreateEvent(sensor.Id);
-
-
-
-
+            
+            var eventGenerators = GetEventGenerators<IEventGenerator>();
+            foreach (var eventGenerator in eventGenerators)
+            {
+                // Call the CreateEvent method of the event generator
+                await eventGenerator.CreateEvent(sensor.Id);
+            }
 
         }
-        // Retrieve the sensor from the repository
-        // var sensor = await _sensorRepository.GetSensorAsync<T>(sensorId);
-        // if (sensor == null)
-        // {
-        //     throw new KeyNotFoundException($"Sensor with ID {sensorId} not found.");
-        // }
-        // Console.WriteLine($"Sensor {sensor.Name} with ID {sensorId} has value {value}.");
+    }
+    public List<IEventGenerator> GetEventGenerators<T>() where T : IEventGenerator
+    {
+        if (_eventRepository == null || _sensorRepository == null)
+        {
+            throw new InvalidOperationException("Repositories must be initialized before creating event generators.");
+        }
 
-        // return false;
+        var eventGenerators = new List<IEventGenerator>
+        {
+            new OutOfRangeEventGenerator(_eventRepository, _sensorRepository)
+        };
+
+        return eventGenerators;
     }
 }

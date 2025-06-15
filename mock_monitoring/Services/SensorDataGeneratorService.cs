@@ -16,17 +16,18 @@ public class SensorDataGeneratorService(IServiceProvider serviceProvider) : Back
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            GenerateMockSensorData(stoppingToken);
+            await GenerateMockSensorData(stoppingToken);
             await Task.Delay(_interval, stoppingToken);
         }
     }
 
-    private void GenerateMockSensorData(CancellationToken stoppingToken)
+    private async Task GenerateMockSensorData(CancellationToken stoppingToken)
     {
 
         using var scope = _serviceProvider.CreateScope();
         _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
-        // _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 35 + 15)).Wait();
-        _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 20)).Wait();
+        // generate between 20 and 55 
+        await _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 20 + 35));
+        // _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 20)).Wait();
     }
 }

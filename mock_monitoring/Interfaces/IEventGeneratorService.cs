@@ -1,6 +1,7 @@
 namespace mock_monitoring.Interfaces;
 
 using mock_monitoring.Models;
+using mock_monitoring.Interfaces;
 
 
 //<summary>
@@ -10,5 +11,6 @@ using mock_monitoring.Models;
 public interface IEventGeneratorService
 {
     Task GenerateEventAsync();
+    List<IEventGenerator> GetEventGenerators<T>() where T : IEventGenerator;
 
 }
