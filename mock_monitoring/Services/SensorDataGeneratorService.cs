@@ -28,6 +28,5 @@ public class SensorDataGeneratorService(IServiceProvider serviceProvider) : Back
         _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
         // generate between 20 and 55 
         await _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 20 + 35));
-        // _sensorRepository.AddReadingAsync<TemperatureSensor>(1, (float)(_random.NextDouble() * 20)).Wait();
     }
 }
