@@ -8,12 +8,27 @@ using mock_monitoring.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// // Add services to the container.
+// builder.Services.AddControllers();
+// // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// builder.Services.AddEndpointsApiExplorer();
+// builder.Services.AddSwaggerGen(); // Add this line
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.AllowAnyOrigin() // Allow any origin
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-
-
-
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<MonitoringDbContext>(options =>
@@ -29,11 +44,19 @@ builder.Services.AddHostedService<EventGeneratorService>();
 builder.Services.AddHostedService<SensorDataGeneratorService>();
 
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
+    // app.UseSwagger(); // Add this line
+    //   app.UseSwaggerUI(options => // UseSwaggerUI is called only in Development.
+    // {
+    //     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    //     options.RoutePrefix = string.Empty;
+    // });
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
@@ -43,6 +66,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors("AllowFrontend"); // Use the CORS policy
 
 app.UseAuthorization();
 
