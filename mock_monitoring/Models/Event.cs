@@ -9,15 +9,22 @@ public abstract class Event
     [Key]
     public int Id { get; set; }
 
-    [ForeignKey("Sensor")]
+
     [Column("SensorId")]
     [Required]
     public int SensorId { get; set; }
 
-    [ForeignKey("SensorLog")]
+    [ForeignKey("SensorId")]
+    public virtual Sensor Sensor { get; set; } = null!; // Navigation property to Sensor
+
+
+
     [Column("SensorLogId")]
     [Required]
     public int SensorLogId { get; set; } // Foreign key to SensorLog
+
+    [ForeignKey("SensorLogId")]
+    public virtual SensorLog SensorLog { get; set; } = null!; // Navigation property to SensorLog
 
     [Required]
     public int Quality { get; set; }
@@ -39,6 +46,9 @@ public abstract class Event
 
     [Required]
     public int End { get; set; } = 0; // timestamp for end of event
+
+
+    // abstract public Task GetOpenEventAsync(int sensorId, int sensorLogId);
 
     // abstract public void CreateEvent(SensorLog sensorLog);
 

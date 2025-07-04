@@ -33,6 +33,21 @@ public class MonitoringDbContext : DbContext
                 .HasDiscriminator<int>("Type")
                 .HasValue<OutOfRangeEvent>(1);
 
+
+        // Define foreign key relationships
+        modelBuilder.Entity<Event>()
+            .HasOne(e => e.Sensor)
+            .WithMany()
+            .HasForeignKey(e => e.SensorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Event>()
+            .HasOne(e => e.SensorLog)
+            .WithMany()
+            .HasForeignKey(e => e.SensorLogId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
         base.OnModelCreating(modelBuilder);
         //seed mock temperature sensor
         modelBuilder.Entity<TemperatureSensor>().HasData(
