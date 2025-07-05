@@ -15,6 +15,11 @@ public class SensorRepository : ISensorRepository
         _dbContext = dbContext;
     }
 
+    public async Task<Sensor?> GetSensorByMacAsync(string macAddress)
+    {
+        return await _dbContext.Sensor.FirstOrDefaultAsync(s => s.MacAddress == macAddress);
+    }
+
     public async Task<T> GetSensorAsync<T>(int sensorId) where T : Sensor
     {
         var sensor = await _dbContext.Set<T>().FirstOrDefaultAsync(s => s.Id == sensorId);
@@ -52,7 +57,7 @@ public class SensorRepository : ISensorRepository
     {
         return await _dbContext.Set<T>().ToListAsync();
     }
-    
+
     public async Task<SensorLog?> GetLatestSensorLogAsync(int sensorId)
     {
         return await _dbContext.SensorLog
@@ -60,5 +65,5 @@ public class SensorRepository : ISensorRepository
             .OrderByDescending(log => log.Timestamp)
             .FirstOrDefaultAsync();
     }
-
+    
 }
