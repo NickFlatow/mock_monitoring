@@ -1,7 +1,7 @@
 
 namespace mock_monitoring.Types;
 
-public class Status
+public class EventStatus
 {
     public const int Normal = 0;
     public const int Low = 1;

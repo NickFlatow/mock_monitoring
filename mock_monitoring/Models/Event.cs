@@ -26,6 +26,7 @@ public abstract class Event
     [ForeignKey("SensorLogId")]
     public virtual SensorLog SensorLog { get; set; } = null!; // Navigation property to SensorLog
 
+
     [Required]
     public int Quality { get; set; }
     [Required]
@@ -34,6 +35,8 @@ public abstract class Event
     [Required]
     public int Type { get; set; } = 0;
 
+    [Required]
+    public int Current_Level { get; set; } = 0; // current level of the event, used for escalation
     [Required]
     public int Level_1 { get; set; } = 0; // timestamp for first level
     [Required]
@@ -47,11 +50,7 @@ public abstract class Event
     [Required]
     public int End { get; set; } = 0; // timestamp for end of event
 
-
-    // abstract public Task GetOpenEventAsync(int sensorId, int sensorLogId);
-
-    // abstract public void CreateEvent(SensorLog sensorLog);
-
-
+    abstract public void EscalateEvent();
+    abstract public void Close();
 
 }

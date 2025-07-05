@@ -34,18 +34,19 @@ public class MonitoringDbContext : DbContext
                 .HasValue<OutOfRangeEvent>(1);
 
 
+
         // Define foreign key relationships
         modelBuilder.Entity<Event>()
             .HasOne(e => e.Sensor)
             .WithMany()
             .HasForeignKey(e => e.SensorId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientNoAction);
 
         modelBuilder.Entity<Event>()
             .HasOne(e => e.SensorLog)
             .WithMany()
             .HasForeignKey(e => e.SensorLogId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientNoAction);
 
 
         base.OnModelCreating(modelBuilder);

@@ -45,13 +45,13 @@ public class TemperatureSensor : Sensor
     {
         if (IsHigh(reading))
         {
-            return Status.High;
+            return EventStatus.High;
         }
         else if (IsLow(reading))
         {
-            return Status.Low;
+            return EventStatus.Low;
         }
-        return Status.Normal;
+        return EventStatus.Normal;
     }
     public override int getQuality(float reading)
     {

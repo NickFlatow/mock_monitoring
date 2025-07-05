@@ -40,8 +40,9 @@ builder.Services.AddScoped<IEventRepository, EventRepository>(); // Register IEv
 builder.Services.AddScoped<ISensorRepository, SensorRepository>(); // Register ISensorRepository
 // builder.Services.AddScoped<ISensorService, SensorService>();
 
-builder.Services.AddHostedService<EventGeneratorService>();
 builder.Services.AddHostedService<SensorDataGeneratorService>();
+builder.Services.AddHostedService<EventGeneratorService>();
+
 
 
 

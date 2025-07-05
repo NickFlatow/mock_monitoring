@@ -22,14 +22,14 @@
         <tbody>
             @foreach (var log in Model)
             {
-                <tr class="@Status.getTableCSSClass(log.Status)">
+                <tr class="@EventStatus.getTableCSSClass(log.Status)">
                     <td>@log.SensorId</td>
                     <td>@log.Timestamp </td>
                     <td>@log.Low</td>
                     <td>@log.Temp</td>
                     <td>@log.High</td>
                     <td>@log.Enable</td>
-                    <td>@Status.GetStatusDescription(log.Status)</td>
+                    <td>@EventStatus.GetStatusDescription(log.Status)</td>
                 </tr>
             }
         </tbody>
