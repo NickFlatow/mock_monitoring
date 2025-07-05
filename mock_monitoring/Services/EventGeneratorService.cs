@@ -28,6 +28,7 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
 
     public async Task GenerateEventAsync()
     {
+        Console.WriteLine("Generating events for all sensors...");
         using var scope = _serviceProvider.CreateScope();
 
         _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
@@ -48,7 +49,7 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
             foreach (var eventGenerator in eventGenerators)
             {
                 // Call the CreateEvent method of the event generator
-                await eventGenerator.CreateEvent(sensor.Id);
+                await eventGenerator.Process(sensor.Id);
             }
 
         }
@@ -62,7 +63,8 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
 
         var eventGenerators = new List<IEventGenerator>
         {
-            new OutOfRangeEventGenerator(_eventRepository, _sensorRepository)
+            new OutOfRangeEventGenerator(_eventRepository, _sensorRepository),
+            // new NetworkEventGenerator(_eventRepository, _sensorRepository),
         };
 
         return eventGenerators;

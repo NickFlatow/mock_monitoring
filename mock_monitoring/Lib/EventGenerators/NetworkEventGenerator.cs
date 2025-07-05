@@ -62,4 +62,14 @@ public class NetworkEventGenerator : IEventGenerator
             await _eventRepository.AddEventsAsync<Event>(networkEvent);
         }
     }
+
+    public Task Process(int sensorId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task ProcessExsistingEvent(Event evt)
+    {
+        throw new NotImplementedException();
+    }
 }

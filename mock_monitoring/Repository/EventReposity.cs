@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using mock_monitoring.Interfaces;
 using mock_monitoring.Models;
 
@@ -27,10 +28,10 @@ public class EventRepository : IEventRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public Task<List<T>> GetOpenEventsAsync<T>(int sensorId) where T : Event
-    {
-        throw new NotImplementedException();
-    }
+    // public Task<List<T>> GetOpenEventsAsync<T>(int sensorId) where T : Event
+    // {
+    //     throw new NotImplementedException();
+    // }
 
     public Task<List<T>> GetSensorEventsAsync<T>(int sensorId) where T : Event
     {
@@ -41,4 +42,27 @@ public class EventRepository : IEventRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<T>> GetOpenEventsAsync<T>(int sensorId, int evtType) where T : Event
+    {
+        return _dbContext.Set<T>()
+            .Where(e => e.SensorId == sensorId && e.Type == evtType && e.End == 0)
+            .ToListAsync();
+        // throw new NotImplementedException();
+    }
+
+    public Task EscalateEventAsync<T>(Event e) where T : Event
+    {
+        e.EscalateEvent();
+        _dbContext.Set<T>().Update((T)e);
+        return _dbContext.SaveChangesAsync();
+    }
+
+    public Task CloseEventAsync<T>(Event e) where T : Event
+    {
+        e.Close();
+        _dbContext.Set<T>().Update((T)e);
+        return _dbContext.SaveChangesAsync();
+    }
+    
 }
