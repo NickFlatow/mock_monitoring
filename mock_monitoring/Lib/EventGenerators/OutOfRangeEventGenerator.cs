@@ -54,20 +54,20 @@ public class OutOfRangeEventGenerator : IEventGenerator
         var currentLevel = evt.Current_Level;
         switch (currentLevel)
         {
-            case EventAlarmLevels.Level1:
+            case EventAlarmLevels.Level0:
                 if (now - evt.Start > level1)
                 {
                    await _eventRepository.EscalateEventAsync<OutOfRangeEvent>(evt);
 
                 }
                 break;
-            case EventAlarmLevels.Level2:
+            case EventAlarmLevels.Level1:
                 if (now - evt.Start > level2)
                 {
                    await _eventRepository.EscalateEventAsync<OutOfRangeEvent>(evt);
                 }
                 break;
-            case EventAlarmLevels.Level3:
+            case EventAlarmLevels.Level2:
                 if (now - evt.Start > level3)
                 {
                     // idk here

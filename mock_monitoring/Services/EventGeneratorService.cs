@@ -28,7 +28,7 @@ public class EventGeneratorService(IServiceProvider serviceProvider) : Backgroun
 
     public async Task GenerateEventAsync()
     {
-        Console.WriteLine("Generating events for all sensors...");
+        Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Generating events for all sensors...");
         using var scope = _serviceProvider.CreateScope();
 
         _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();

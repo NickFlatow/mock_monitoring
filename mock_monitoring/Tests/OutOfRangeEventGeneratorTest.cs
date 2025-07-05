@@ -174,7 +174,7 @@ namespace mock_monitoring.Tests
                 Quality = Quality.Sensor,
                 Status = EventStatus.High,
                 Type = EventTypes.OutOfRange,
-                Current_Level = EventAlarmLevels.Level1,
+                Current_Level = EventAlarmLevels.Level0,
                 Level_1 = 0,
                 Level_2 = 0,
                 Level_3 = 0,
@@ -242,7 +242,7 @@ namespace mock_monitoring.Tests
             _eventRepositoryMock.Verify(repo => repo.CloseEventAsync<OutOfRangeEvent>(existingEvent), Times.Once());
             _eventRepositoryMock.Verify(repo => repo.EscalateEventAsync<Event>(It.IsAny<Event>()), Times.Never());
         }
-
+        
 
         //close an open event if the sensor goes back in range
         //   public async Task ProcessExsistingEvent_EventBackInRange_ClosesEvent()
