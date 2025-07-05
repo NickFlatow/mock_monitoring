@@ -195,18 +195,6 @@ namespace mock_monitoring.Tests
         public async Task ProcessExsistingEvent_CloseEvent()
         {
             var sensorId = 1;
-
-            //add sensorLog to be checked for event close
-            var sensorLog = new SensorLog
-            {
-                Id = 1,
-                SensorId = sensorId,
-                Status = EventStatus.High,
-                Quality = Quality.Sensor
-            };
-
-            _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
-                .ReturnsAsync(sensorLog);
             // Arrange
             var existingEvent = new OutOfRangeEvent
             {
@@ -223,6 +211,9 @@ namespace mock_monitoring.Tests
                 Start = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 400,
                 End = 0,
             };
+
+            _eventRepositoryMock.Setup(repo => repo.GetOpenEventsAsync<OutOfRangeEvent>(existingEvent.SensorId, EventTypes.OutOfRange))
+                .ReturnsAsync([existingEvent]);
 
             // Simulate sensor back in range (Quality.Good, Status.Normal)
             var backInRangeSensorLog = new SensorLog
