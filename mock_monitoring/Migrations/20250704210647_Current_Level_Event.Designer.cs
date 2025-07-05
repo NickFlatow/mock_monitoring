@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using mock_monitoring.Models;
 
@@ -11,9 +12,11 @@ using mock_monitoring.Models;
 namespace mock_monitoring.Migrations
 {
     [DbContext(typeof(MonitoringDbContext))]
-    partial class MonitoringDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250704210647_Current_Level_Event")]
+    partial class Current_Level_Event
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,13 +161,6 @@ namespace mock_monitoring.Migrations
                     b.ToTable("SensorLog");
                 });
 
-            modelBuilder.Entity("mock_monitoring.Lib.Events.ClosedEvent", b =>
-                {
-                    b.HasBaseType("mock_monitoring.Models.Event");
-
-                    b.HasDiscriminator().HasValue(0);
-                });
-
             modelBuilder.Entity("mock_monitoring.Lib.Events.OutOfRangeEvent", b =>
                 {
                     b.HasBaseType("mock_monitoring.Models.Event");
@@ -183,7 +179,7 @@ namespace mock_monitoring.Migrations
                         {
                             Id = 1,
                             Alarmen = (sbyte)0,
-                            CreatedAt = new DateTime(2025, 7, 5, 20, 7, 34, 711, DateTimeKind.Utc).AddTicks(6312),
+                            CreatedAt = new DateTime(2025, 7, 4, 21, 6, 46, 728, DateTimeKind.Utc).AddTicks(8103),
                             Enable = true,
                             MacAddress = "00:11:22:33:44:55",
                             Name = "Mock Sensor 1",
@@ -198,13 +194,13 @@ namespace mock_monitoring.Migrations
                     b.HasOne("mock_monitoring.Models.Sensor", "Sensor")
                         .WithMany()
                         .HasForeignKey("SensorId")
-                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("mock_monitoring.Models.SensorLog", "SensorLog")
                         .WithMany()
                         .HasForeignKey("SensorLogId")
-                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Sensor");
