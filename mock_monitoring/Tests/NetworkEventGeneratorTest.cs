@@ -1,10 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Moq;
 using Xunit;
 using mock_monitoring.Lib.EventGenerators;
 using mock_monitoring.Lib.Events;
-using mock_monitoring.Repository;
 using mock_monitoring.Interfaces;
 using mock_monitoring.Models;
 using mock_monitoring.Types;
@@ -28,7 +25,6 @@ namespace mock_monitoring.Tests
         public async Task CreateEvent_NoNetworkEvent()
         {
             // Arrange
-
             var sensor = new TemperatureSensor
             {
                 Id = 1,
@@ -41,7 +37,7 @@ namespace mock_monitoring.Tests
             {
                 Id = 1,
                 SensorId =  sensor.Id,
-                Status = Status.Normal,
+                Status = EventStatus.Normal,
                 Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 300
             };
 
@@ -74,9 +70,11 @@ namespace mock_monitoring.Tests
             {
                 Id = 1,
                 SensorId =  sensor.Id,
-                Status = Status.Normal,
+                Status = EventStatus.Normal,
                 Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1200
             };
+
+
             _sensorRepositoryMock.Setup(repo => repo.GetSensorAsync<Sensor>(sensor.Id))
                 .ReturnsAsync(sensor);
             _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensor.Id))

@@ -8,6 +8,7 @@ using mock_monitoring.Repository;
 using mock_monitoring.Interfaces;
 using mock_monitoring.Models;
 using mock_monitoring.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace mock_monitoring.Tests
 {
@@ -27,13 +28,20 @@ namespace mock_monitoring.Tests
         [Fact]
         public async Task CreateEvent_NoSensorLog_DoesNotAddEvent()
         {
+            var sensorLog = new SensorLog
+            {
+                Id = 1,
+                SensorId = 1,
+                Status = EventStatus.Normal
+            };
+
             // Arrange
             int sensorId = 1;
             _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
-                .ReturnsAsync((SensorLog)null);
+                .ReturnsAsync(sensorLog);
 
             // Act
-            await _generator.CreateEvent(sensorId);
+            await _generator.Process(sensorId);
 
             // Assert
             _eventRepositoryMock.Verify(repo => repo.AddEventsAsync<Event>(It.IsAny<Event>()), Times.Never());
@@ -48,13 +56,13 @@ namespace mock_monitoring.Tests
             {
                 Id = 1,
                 SensorId = sensorId,
-                Status = Status.Normal
+                Status = EventStatus.Normal
             };
             _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
                 .ReturnsAsync(sensorLog);
 
             // Act
-            await _generator.CreateEvent(sensorId);
+            await _generator.Process(sensorId);
 
             // Assert
             _eventRepositoryMock.Verify(repo => repo.AddEventsAsync<Event>(It.IsAny<Event>()), Times.Never());
@@ -69,13 +77,13 @@ namespace mock_monitoring.Tests
             {
                 Id = 1,
                 SensorId = sensorId,
-                Status = Status.High,
+                Status = EventStatus.High,
             };
             _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
                 .ReturnsAsync(sensorLog);
 
             // Act
-            await _generator.CreateEvent(sensorId);
+            await _generator.Process(sensorId);
 
             // Assert
             _eventRepositoryMock.Verify(repo => repo.AddEventsAsync<Event>(It.Is<OutOfRangeEvent>(e =>
@@ -91,14 +99,161 @@ namespace mock_monitoring.Tests
             )), Times.Once());
         }
 
-        //todo don't create a new evnet when there is already an outofRange open event for the same sensor
+        //DONT create a new event when there is already an outofRange open event for the same sensor
+        [Fact]
+        public async Task CreateEvent_ExistingOutOfRangeEvent_DoesNotAddNewEvent()
+        {
+            // Arrange
+            int sensorId = 1;
 
+            //add sensorLog to be checked for event close
+            var sensorLog = new SensorLog
+            {
+                Id = 1,
+                SensorId = sensorId,
+                Status = EventStatus.High,
+                Quality = Quality.Sensor
+            };
+
+            _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
+                .ReturnsAsync(sensorLog);
+
+            var existingEvent = new OutOfRangeEvent
+            {
+                SensorId = sensorId,
+                SensorLogId = sensorLog.Id,
+                Quality = Quality.Sensor,
+                Status = sensorLog.Status,
+                Type = EventTypes.OutOfRange,
+                Current_Level = EventAlarmLevels.Level1,
+                Level_1 = 0,
+                Level_2 = 0,
+                Level_3 = 0,
+                Start = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                End = 0,
+            };
+
+
+
+            _eventRepositoryMock.Setup(repo => repo.GetOpenEventsAsync<OutOfRangeEvent>(sensorId, EventTypes.OutOfRange))
+                .ReturnsAsync([existingEvent]);
+
+
+            // Act
+            await _generator.Process(sensorId);
+
+            // Assert
+            _eventRepositoryMock.Verify(repo => repo.AddEventsAsync<Event>(It.IsAny<Event>()), Times.Never());
+                
+
+        }
+
+        //todo test escalation of events
+        [Fact]
+        public async Task ProcessExsistingEvent_EventEscalation_UpdatesEvent()
+        {
+            var sensorId = 1;
+
+            //add sensorLog to be checked for event close
+            var sensorLog = new SensorLog
+            {
+                Id = 1,
+                SensorId = sensorId,
+                Status = EventStatus.High,
+                Quality = Quality.Sensor
+            };
+
+            _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
+                .ReturnsAsync(sensorLog);
+            // Arrange
+            var existingEvent = new OutOfRangeEvent
+            {
+                Id = 1,
+                SensorId = 1,
+                SensorLogId = 1,
+                Quality = Quality.Sensor,
+                Status = EventStatus.High,
+                Type = EventTypes.OutOfRange,
+                Current_Level = EventAlarmLevels.Level1,
+                Level_1 = 0,
+                Level_2 = 0,
+                Level_3 = 0,
+                Start = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 400,
+                End = 0,
+            };
+
+            _eventRepositoryMock.Setup(repo => repo.GetOpenEventsAsync<OutOfRangeEvent>(existingEvent.SensorId, EventTypes.OutOfRange))
+                .ReturnsAsync([existingEvent]);
+
+            // Act
+            await _generator.Process(sensorId);
+
+            // Assert
+            _eventRepositoryMock.Verify(repo => repo.EscalateEventAsync<Event>(It.IsAny<Event>()), Times.Once());
+        }
+        [Fact]
+        public async Task ProcessExsistingEvent_CloseEvent()
+        {
+            var sensorId = 1;
+
+            //add sensorLog to be checked for event close
+            var sensorLog = new SensorLog
+            {
+                Id = 1,
+                SensorId = sensorId,
+                Status = EventStatus.High,
+                Quality = Quality.Sensor
+            };
+
+            _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
+                .ReturnsAsync(sensorLog);
+            // Arrange
+            var existingEvent = new OutOfRangeEvent
+            {
+                Id = 1,
+                SensorId = 1,
+                SensorLogId = 1,
+                Quality = Quality.Sensor,
+                Status = EventStatus.High,
+                Type = EventTypes.OutOfRange,
+                Current_Level = EventAlarmLevels.Level1,
+                Level_1 = 0,
+                Level_2 = 0,
+                Level_3 = 0,
+                Start = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 400,
+                End = 0,
+            };
+
+            // Simulate sensor back in range (Quality.Good, Status.Normal)
+            var backInRangeSensorLog = new SensorLog
+            {
+                Id = 1,
+                SensorId = sensorId,
+                Status = EventStatus.Normal,
+                Quality = Quality.Good
+            };
+            _sensorRepositoryMock.Setup(repo => repo.GetLatestSensorLogAsync(sensorId))
+                .ReturnsAsync(backInRangeSensorLog);
+
+            // Act
+            await _generator.Process(sensorId);
+
+            // Assert
+            _eventRepositoryMock.Verify(repo => repo.CloseEventAsync<OutOfRangeEvent>(existingEvent), Times.Once());
+            _eventRepositoryMock.Verify(repo => repo.EscalateEventAsync<Event>(It.IsAny<Event>()), Times.Never());
+        }
+
+
+        //close an open event if the sensor goes back in range
+        //   public async Task ProcessExsistingEvent_EventBackInRange_ClosesEvent()
 
 
 
         public void Dispose()
         {
             // Cleanup if needed (e.g., reset mocks)
+            _eventRepositoryMock.Reset();
+            _sensorRepositoryMock.Reset();
         }
     }
 }
