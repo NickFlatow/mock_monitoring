@@ -3,6 +3,8 @@ using mock_monitoring.Interfaces;
 using mock_monitoring.Models;
 using mock_monitoring.Repository;
 
+using mock_monitoring.Lib.Sensors.esp32;
+
 namespace mock_monitoring.Controllers
 {
     [ApiController]
@@ -53,27 +55,30 @@ namespace mock_monitoring.Controllers
         }
 
         [HttpPost("data")]
-        public async Task<IActionResult> PostSensorData([FromBody] ISensorData data)
+        public async Task<IActionResult> PostSensorData([FromBody] Esp32 data)
         {
+            Console.WriteLine($"Received data: {data?.MAC}, SD1: {data?.SD1}, SD2: {data?.SD2}");
             if (data == null || string.IsNullOrEmpty(data.MAC))
             {
+                Console.WriteLine("Invalid sensor data or missing MAC address.");
                 return BadRequest(new { Message = "Invalid sensor data or missing MAC address." });
             }
-
-            //todo get sensor from mac
             var sensor = await _sensorRepository.GetSensorByMacAsync(data.MAC);
             if (sensor == null)
             {
+                Console.WriteLine($"Sensor with MAC address {data.MAC} not found.");
                 return NotFound($"Sensor with MAC address {data.MAC} not found.");
             }
 
             if (!sensor.Enable)
             {
+                Console.WriteLine($"Sensor {sensor.Name} is disabled.");
                 return BadRequest(new { Message = $"Sensor {sensor.Name} is disabled." });
             }
 
             if (data.SD1 != null)
             {
+                Console.WriteLine($"Adding reading for sensor {sensor.Name}: {data.SD1.Value}");
                 await _sensorRepository.AddReadingAsync<Sensor>(sensor.Id, data.SD1.Value);
             }
             //todo update for two readings should handle temp and humidity
@@ -83,6 +88,6 @@ namespace mock_monitoring.Controllers
 
             return Ok(new { Message = "Data received successfully." });
         }
-    
+
     }
 }

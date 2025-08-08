@@ -5,9 +5,21 @@ using mock_monitoring.Mock_Sensor;
 using mock_monitoring.Services;
 using mock_monitoring.Repository;
 using mock_monitoring.Interfaces;
+using Microsoft.AspNetCore.HttpLogging;
+
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.All; // Log all fields (Path, Status Code, Headers, Body, etc.)
+    options.RequestBodyLogLimit = 4096; // Limit request body size to log
+    options.ResponseBodyLogLimit = 4096; // Limit response body size to log
+    options.CombineLogs = true; // Combine request and response into a single log entry
+    // You can also add specific headers to log:
+    // options.RequestHeaders.Add("User-Agent");
+    // options.ResponseHeaders.Add("Content-Type");
+    // You can use interceptors for more fine-grained control or redaction
+});
 
 // // Add services to the container.
 // builder.Services.AddControllers();
@@ -48,7 +60,7 @@ builder.Services.AddHostedService<EventGeneratorService>();
 
 
 var app = builder.Build();
-
+app.UseHttpLogging();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

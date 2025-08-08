@@ -15,6 +15,7 @@
                 <th>Mac Address</th>
                 <th>Profile</th>
                 <th>Enable</th>
+                <th>SensorLogs</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +27,9 @@
                     <td>@sensor.MacAddress</td>
                     <td>@sensor.ProfileId</td>
                     <td>@sensor.Enable</td>
+                    <td>
+                        <a asp-action="SensorLogs" asp-route-sensorId="@sensor.Id" class="btn btn-primary btn-sm">View Logs</a>
+                    </td>
                 </tr>
             }
         </tbody>

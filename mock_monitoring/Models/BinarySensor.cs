@@ -4,40 +4,44 @@ using mock_monitoring.Types;
 
 namespace mock_monitoring.Models;
 
-public class TemperatureSensor : Sensor
+public class BinarySensor : Sensor
 {
     //todo min/max temps in C conversion to F on the template 
-    private const int minTemp = 64;
-    private const int maxTemp = 80;
+    private const int HIGH = 1;
+    private const int LOW = 0;
 
     // todo private Profile temperatureProfile;
 
     public override bool IsOutOfRange(float reading)
     {
-        return reading < minTemp || reading > maxTemp;
+        return true;
+        // return reading < minTemp || reading > maxTemp;
     }
 
     public bool IsHigh(float reading)
     {
-        return reading > maxTemp;
+        return reading == HIGH;
+        // return reading > maxTemp;
     }
     public bool IsLow(float reading)
     {
-        return reading < minTemp;
+        return reading == LOW;
+        // return reading < minTemp;
+        // return reading < minTemp;
     }
     public override SensorLog addReading(float reading)
     {
-        var fahrenheitReading = convertToFahrenheit(reading);
+
         var log = new SensorLog
         {
             SensorId = this.Id,
-            Temp = fahrenheitReading,
+            Temp = reading,
             Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             Enable = this.Enable,
-            High = maxTemp, // todo get from profile
-            Low = minTemp, // todo get from profile
-            Status = getStatus(fahrenheitReading),
-            Quality = getQuality(fahrenheitReading)
+            High = HIGH, // todo get from profile
+            Low = LOW, // todo get from profile
+            Status = getStatus(reading),
+            Quality = getQuality(reading)
 
         };
 
@@ -58,12 +62,6 @@ public class TemperatureSensor : Sensor
     public override int getQuality(float reading)
     {
         return Quality.Good;
-    }
-
-    private float convertToFahrenheit(float celsius)
-    {
-        // Conversion logic from Celsius to Fahrenheit
-        return (celsius * 9 / 5) + 32;
     }
 
 

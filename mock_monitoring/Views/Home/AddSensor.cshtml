@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Sensors";
+}
+
+@model Sensor
+
+<div class="text-center">
+    <h1 class="display-4">Sensors</h1>
+
+    <!-- Add Sensor Form -->
+    <form asp-action="AddSensorPost" method="post" class="mb-4">
+        <div class="form-row">
+            <div class="form-group col">
+                <input asp-for="Name" class="form-control" placeholder="Name" name="Name" required />
+            </div>
+            <div class="form-group col">
+                <input asp-for="MacAddress" class="form-control" placeholder="Mac Address" name="MacAddress" required />
+            </div>
+            <div class="form-group col">
+                <input asp-for="ProfileId" class="form-control" placeholder="Profile ID" name="ProfileId" type="number" required />
+            </div>
+            <div class="form-group col">
+                <input asp-for="Sample_Period" class="form-control" placeholder="Sample Period" name="Sample_Period" type="number" required />
+            </div>
+            <div class="form-group col">
+                <input asp-for="Type" class="form-control" placeholder="Type" name="Type" type="number" required />
+            </div>
+            <div class="form-group col">
+                <select asp-for="Enable" class="form-control" name="Enable">
+                    <option value="true">Enabled</option>
+                    <option value="false">Disabled</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Sensor</button>
+    </form>

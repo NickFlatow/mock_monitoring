@@ -25,7 +25,8 @@ public class MonitoringDbContext : DbContext
         modelBuilder.Entity<Sensor>()
                 .ToTable("Sensor")
                 .HasDiscriminator<int>("Type")
-                .HasValue<TemperatureSensor>(104);
+                .HasValue<TemperatureSensor>(104)
+                .HasValue<BinarySensor>(105);
         // .HasValue<TempHumiditySensor>(113);
 
         modelBuilder.Entity<Event>()

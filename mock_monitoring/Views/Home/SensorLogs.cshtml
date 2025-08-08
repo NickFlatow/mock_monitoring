@@ -24,7 +24,7 @@
             {
                 <tr class="@EventStatus.getTableCSSClass(log.Status)">
                     <td>@log.SensorId</td>
-                    <td>@log.Timestamp </td>
+                    <td>@DateTimeOffset.FromUnixTimeSeconds(log.Timestamp).LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
                     <td>@log.Low</td>
                     <td>@log.Temp</td>
                     <td>@log.High</td>
