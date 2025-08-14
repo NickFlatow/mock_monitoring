@@ -1,0 +1,38 @@
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+EXPOSE 8080
+EXPOSE 8081
+
+RUN mkdir /src/
+WORKDIR /src/
+
+
+COPY ./mock_monitoring/mock_monitoring.csproj /src/mock_monitoring/mock_monitoring.csproj
+RUN dotnet restore /src/mock_monitoring/mock_monitoring.csproj
+
+COPY ./mock_monitoring/ /src/mock_monitoring/
+
+RUN mkdir /out/
+WORKDIR /src/mock_monitoring/
+
+# CMD ["tail", "-f", "/dev/null"]
+
+# # RUN dotnet clean mock_monitoring.csproj
+# RUN dotnet clean
+RUN dotnet build --configuration Debug
+RUN dotnet publish mock_monitoring.csproj --output /out --configuration Debug --no-restore
+
+#install debugger for NET Core
+RUN apt-get update
+RUN apt-get install -y unzip
+RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l /root/vsdbg
+
+ENTRYPOINT ["dotnet", "run"]
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
+WORKDIR /app
+COPY --from=build /out/ /app
+
+ENTRYPOINT ["dotnet", "mock_monitoring.dll"]

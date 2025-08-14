@@ -20,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var log in Model)
+            @foreach (var log in Model.OrderByDescending(x => x.Timestamp))
             {
                 <tr class="@EventStatus.getTableCSSClass(log.Status)">
                     <td>@log.SensorId</td>

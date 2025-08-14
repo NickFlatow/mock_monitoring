@@ -1,0 +1,54 @@
+services:
+  mock_monitoring:
+    env_file:
+      - path: .env
+    build:
+      context: .
+      dockerfile: ./.docker/dockerfiles/dockerfile.mock_monitoring
+      target: build
+    volumes:
+      - ./mock_monitoring:/src/mock_monitoring
+    depends_on:
+      - db
+    networks:
+      - app-network
+    ports:
+      - "${PORT}:${PORT}"
+      # - "80:80"
+      # - "5173:5173" #vite port
+      # - "443:443"
+      # - "6379:6379" #redis
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  db:
+    # build:
+    #   context: .
+    #   dockerfile: ./.docker/dockerfiles/dockerfile.db
+    image: mariadb:latest
+    volumes: 
+     - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_PASS}
+      - MARIADB_USER=${DB_USER}
+    healthcheck:
+      test: ["CMD","mariadb-admin", "-u", "${DB_USER}", "-p${DB_PASS}",  "ping", "-h", "db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+networks:
+  app-network:
+    driver: bridge
+
+# allows you to share data between containers
+# docker will create a volume for the db-data directory if it does not exist
+# docker will recreate the volume if it is deleted manually
+volumes:
+  db-data:
