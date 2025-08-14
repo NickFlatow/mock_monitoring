@@ -8,6 +8,8 @@ services:
       target: build
     volumes:
       - ./mock_monitoring:/src/mock_monitoring
+      - /src/mock_monitoring/obj  # Anonymous volume for obj directory
+      - /src/mock_monitoring/bin  # Anonymous volume for bin directory
     depends_on:
       - db
     networks:
